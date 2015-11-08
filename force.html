@@ -1,3 +1,8 @@
+//Matthew Brien
+//ITCS 4122 D3 homework
+//Based on collision detection http://bl.ocks.org/mbostock/3231298
+//added the ability to pause movement, and remove circles by clicking.
+
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
@@ -12,7 +17,7 @@ var width = 960,
 
 
 
-var nodes = d3.range(200).map(function() { return {radius: Math.random() * 12 + 4}; }),
+var nodes = d3.range(300).map(function() { return {radius: Math.random() * 12 + 4}; }),
     root = nodes[0],
     color = d3.scale.category10();
 
@@ -47,26 +52,35 @@ var svg = d3.select("body").append("svg")
         force.resume();
     }})
 
+
+
+function removeCircle(node){var i = nodes.indexOf(node);nodes.splice(i,1);}
+
+
 var circles = svg.selectAll("circle")
     .data(nodes.slice(1))
     .enter().append("circle")
     .attr("r", function(d) { return d.radius; })
-    .style("fill", function(d, i) { return color(i % 3); })
-    .on('click', function(){d3.select(this).transition().attr("opcaity",0).attr('r',0).remove()
+    .style("fill", function(d, i) { return color(i % 5); })
+    .on('click', function(d){removeCircle(d);d3.select(this).transition().attr("opcaity",0).attr('r',0).remove()
   });
 
-    //d3.select(this).attr('opacity', 0)
-//d3.select(this).attr('r',0.0001)
+
 
 
 
 force.on("tick", function(e) {
 
-  var q = d3.geom.quadtree(nodes),
-      i = 0,
-      n = nodes.length;
+  var q = d3.geom.quadtree(nodes);
+  var  i = 0;
+  var n = nodes.length;
 
-  while (++i < n) q.visit(collide(nodes[i]));
+
+
+  while (++i < n){
+
+    q.visit(collide(nodes[i]));
+}
 
   svg.selectAll("circle")
       .attr("cx", function(d) { return d.x; })
